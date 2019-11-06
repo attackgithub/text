@@ -22,50 +22,52 @@
 
 <template>
 	<div id="editor-wrapper">
-		<button class="icon-close" @click="close" />
-		<button class="icon-share" @click="share" />
-		<ReadOnlyEditor :content="initial.content" :is-rich-editor="true" />
-		<hr>
+		<EditorWrapper :initial-session="initialSession" :active="true" mime="text/markdown">
+			<template #header>
+				<button class="icon-share" @click="share" />
+				<button class="icon-close" @click="close" />
+			</template>
+		</EditorWrapper>
+		<!--<hr>
 		<h3>Debug output</h3>
+		<pre>{{ initialSession }}</pre>
 		<pre>Last request time: {{ log.mtime }}</pre>
-		<pre>{{ messages }}</pre>
+		<pre>{{ messages }}</pre>-->
 	</div>
 </template>
 
 <script>
 import Vue from 'vue'
-import axios from '@nextcloud/axios'
-import ReadOnlyEditor from '../components/ReadOnlyEditor'
+import EditorWrapper from '../components/EditorWrapper'
 
 const log = Vue.observable({
 	messages: [],
-	mtime: 0
+	mtime: 0,
 })
 
 window.OCP.DirectEditing = {
 	close() {
 		log.messages.push('OCP.DirectEditing.close got called')
-	}
+	},
 }
-
-setInterval(() => {
-	axios.get(OC.generateUrl('apps/text/direct/session/create?token=' + OCP.InitialState.loadState('text', 'directEditingToken'))).then(({ data }) => {
-		Vue.set(log, 'mtime', data.mtime)
-	})
-}, 1000)
 
 window.addEventListener('message', function(message) {
 	log.messages.push(message.data)
 })
 export default {
 	name: 'DirectEditing',
-	components: { ReadOnlyEditor },
+	components: { EditorWrapper },
 	data() {
 		return {
 			initial: OCP.InitialState.loadState('text', 'file'),
 			messages: log.messages,
-			log: log
+			log: log,
 		}
+	},
+	computed: {
+		initialSession() {
+			return JSON.parse(this.initial.session) || null
+		},
 	},
 	methods: {
 		close() {
@@ -73,31 +75,41 @@ export default {
 		},
 		share() {
 			window.postMessage('share')
-		}
-	}
+		},
+	},
 }
 </script>
 
-<style scoped>
-	button {
-		width: 44px;
-		height: 44px;
-	}
-	#editor-wrapper {
-		width: 100%;
-	}
-	#editor-wrapper::v-deep .ProseMirror {
-		width: 100%;
-		max-width: 700px;
-		margin: auto;
-		opacity: 1;
-		border: none;
-		background-color: transparent;
-	}
+<style scoped lang="scss">
 	pre {
 		width: 100%;
 		max-width: 700px;
 		margin: auto;
 		background-color: var(--color-background-dark);
+	}
+
+	button {
+		width: 44px;
+		height: 44px;
+		margin: 0;
+		background-size: 16px;
+		border: 0;
+		background-color: transparent;
+		opacity: .5;
+		color: var(--color-main-text);
+		background-position: center center;
+		vertical-align: top;
+		&:hover, &:focus, &:active {
+			background-color: var(--color-background-dark);
+		}
+		&.is-active,
+		&:hover,
+		&:focus {
+			opacity: 1;
+		}
+
+		&.icon-undo, &.icon-redo {
+			opacity: .4;
+		}
 	}
 </style>

@@ -23,7 +23,9 @@
 
 namespace OCA\Text\DirectEditing;
 
+use OCA\Files\Controller\ApiController;
 use OCA\Text\AppInfo\Application;
+use OCA\Text\Service\ApiService;
 use OCP\AppFramework\Http\NotFoundResponse;
 use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -43,9 +45,13 @@ class TextDirectEditor implements IEditor {
 	/** @var IInitialStateService */
 	private $initialStateService;
 
-	public function __construct(IL10N $l10n, IInitialStateService $initialStateService) {
+	/** @var ApiService */
+	private $apiService;
+
+	public function __construct(IL10N $l10n, IInitialStateService $initialStateService, ApiService $apiService) {
 		$this->l10n = $l10n;
 		$this->initialStateService = $initialStateService;
+		$this->apiService = $apiService;
 	}
 
 	/**
@@ -125,15 +131,16 @@ class TextDirectEditor implements IEditor {
 	 * @return Response
 	 */
 	public function open(IToken $token): Response {
+		$token->useTokenScope();
 		try {
+			$session = $this->apiService->create($token->getFile()->getId());
 			$this->initialStateService->provideInitialState('text', 'file', [
 				'fileId' => $token->getFile()->getId(),
-				'content' => $token->getFile()->getContent()
+				'content' => $token->getFile()->getContent(),
+				'session' => \json_encode($session->getData())
 			]);
 			$this->initialStateService->provideInitialState('text', 'directEditingToken', $token->getToken());
-			return new TemplateResponse('text', 'main', [
-				'foo' => json_encode($token, true)
-			], 'base');
+			return new TemplateResponse('text', 'main', [], 'base');
 		} catch (InvalidPathException $e) {
 		} catch (NotFoundException $e) {
 		} catch (NotPermittedException $e) {
