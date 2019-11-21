@@ -24,11 +24,11 @@
 namespace OCA\Text\DirectEditing;
 
 
-use OCP\DirectEditing\ICreateEmpty;
+use OCP\DirectEditing\ACreateEmpty;
 use OCP\Files\File;
 use OCP\IL10N;
 
-class TextDocumentCreator extends ICreateEmpty {
+class TextDocumentCreator extends ACreateEmpty {
 
 	/**
 	 * @var IL10N

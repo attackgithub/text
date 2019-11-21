@@ -101,7 +101,7 @@ class TextDirectEditor implements IEditor {
 	/**
 	 * Return a list of file creation options to be presented to the user
 	 *
-	 * @return array of ICreateFromTemplate|ICreateEmpty
+	 * @return array of ACreateFromTemplate|ACreateEmpty
 	 */
 	public function getCreators(): array {
 		return [

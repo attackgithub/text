@@ -24,11 +24,11 @@
 namespace OCA\Text\DirectEditing;
 
 
-use OCP\DirectEditing\ICreateFromTemplate;
+use OCP\DirectEditing\ACreateFromTemplate;
 use OCP\Files\File;
 use OCP\IL10N;
 
-class TextDocumentTemplateCreator extends ICreateFromTemplate {
+class TextDocumentTemplateCreator extends ACreateFromTemplate {
 
 	const TEMPLATES = [
 		'1' => [
