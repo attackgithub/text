@@ -49,7 +49,7 @@ const log = Vue.observable({
 })
 
 const callMobileMessage = (messageName, attributes) => {
-	console.debug('callMobileMessage', messageName, attributes)
+	console.debug('callMobileMessage ' + messageName, attributes)
 	let message = messageName
 	if (typeof attributes !== 'undefined') {
 		message = {
